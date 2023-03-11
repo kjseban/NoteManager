@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NoteManager.Data;
 
@@ -11,9 +12,11 @@ using NoteManager.Data;
 namespace NoteManager.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230311170756_ChangeAEDLogInDataBase")]
+    partial class ChangeAEDLogInDataBase
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -235,13 +238,11 @@ namespace NoteManager.Migrations
                     b.Property<DateTime>("ActionDateTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Flag")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Flag")
+                        .HasColumnType("int");
 
-                    b.Property<string>("NoteText")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("NoteText")
+                        .HasColumnType("int");
 
                     b.HasKey("ID");
 

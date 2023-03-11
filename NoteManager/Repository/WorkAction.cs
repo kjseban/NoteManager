@@ -4,16 +4,18 @@ using NoteManager.Repository.IRepository;
 
 namespace NoteManager.Repository
 {
-    public class WorkAction: IWorkAction
+    public class WorkAction : IWorkAction
     {
         private ApplicationDbContext _db;
 
-            public WorkAction(ApplicationDbContext db) 
+        public WorkAction(ApplicationDbContext db)
         {
             _db = db;
             Note = new NoteRepository(_db);
+            AddEditDeleteLog = new AddEditDeleteLogRepository(_db);
         }
         public INoteRepository Note { get; private set; }
+        public IAddEditDeleteLogRepository AddEditDeleteLog { get; private set; }
 
         public void Save()
         {

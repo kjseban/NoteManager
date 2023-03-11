@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using NoteManager.Data;
 using NoteManager.Models;
 using NoteManager.Repository.IRepository;
 
@@ -11,7 +10,7 @@ namespace NoteManager.Controllers
 
         public NoteController(IWorkAction workAction)
         {
-                _workAction = workAction;
+            _workAction = workAction;
         }
 
         public IActionResult Index()
@@ -25,7 +24,6 @@ namespace NoteManager.Controllers
             return View();
         }
 
-        //POST
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Create(Note obj)
@@ -33,14 +31,21 @@ namespace NoteManager.Controllers
             if (ModelState.IsValid)
             {
                 _workAction.Note.Add(obj);
+
+                _workAction.AddEditDeleteLog.Add(new AddEditDeleteLog()
+                {
+                    NoteText = obj.NoteText,
+                    Flag = "Create",
+                    ActionDateTime = DateTime.Now
+                });
                 _workAction.Save();
+
                 TempData["success"] = "Note created successfully";
                 return RedirectToAction("Index");
             }
             return View(obj);
         }
 
-        //GET
         public IActionResult Edit(int? id)
         {
             if (id == null || id == 0)
@@ -53,19 +58,22 @@ namespace NoteManager.Controllers
             {
                 return NotFound();
             }
-
             return View(noteFromDbFirst);
         }
 
-        //POST
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Edit(Note obj)
         {
-            
             if (ModelState.IsValid)
             {
                 _workAction.Note.Update(obj);
+                _workAction.AddEditDeleteLog.Add(new AddEditDeleteLog()
+                {
+                    NoteText = obj.NoteText,
+                    Flag = "Edit",
+                    ActionDateTime = DateTime.Now
+                });
                 _workAction.Save();
                 TempData["success"] = "Note updated successfully";
                 return RedirectToAction("Index");
@@ -89,7 +97,6 @@ namespace NoteManager.Controllers
             return View(noteFromDbFirst);
         }
 
-        //POST
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public IActionResult DeletePOST(int? id)
@@ -99,12 +106,25 @@ namespace NoteManager.Controllers
             {
                 return NotFound();
             }
-
-            _workAction.Note.Remove(obj);
-            _workAction.Save();
+            try
+            {
+                _workAction.Note.Remove(obj);
+                _workAction.AddEditDeleteLog.Add(new AddEditDeleteLog()
+                {
+                    NoteText = obj.NoteText,
+                    Flag = "Delete",
+                    ActionDateTime = DateTime.Now
+                });
+                _workAction.Save();
+            }
+            catch(Exception ex) 
+            {
+                TempData["success"] = "Note not Deleted " +ex.Message;
+                return RedirectToAction("Index");
+            }
+           
             TempData["success"] = "Note deleted successfully";
             return RedirectToAction("Index");
-
         }
     }
 }

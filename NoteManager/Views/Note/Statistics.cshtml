@@ -1,6 +1,4 @@
 ﻿@page
-@* NoteManager.Views.Note.StatisticsModel*@
-@model Dictionary<string, int>
 <div>
     <canvas id="myChart"></canvas>
 </div>
@@ -36,7 +34,7 @@
             data: {
                 labels: [...keys],
                 datasets: [{
-                    label: '# CRUD operations',
+                    label: 'Note Manager Statistics',
                     data: [...values],
                     borderWidth: 1
                 }]
@@ -46,8 +44,14 @@
                     y: {
                         beginAtZero: true
                     }
+
                 }
             }
         });
     </script>
+    <div class="border p-3 mt-4">
+    <a asp-controller="Note" asp-action="Index" class="btn btn-primary" style="width:150px">
+        Back to List
+    </a>
+    </div>
 }

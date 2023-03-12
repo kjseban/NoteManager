@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using NoteManager.Models;
 using NoteManager.Repository.IRepository;
+using System.Linq;
 
 namespace NoteManager.Controllers
 {
@@ -19,6 +21,26 @@ namespace NoteManager.Controllers
             return View(objNoteList);
         }
 
+        public IActionResult Statistics()
+        {
+            IEnumerable<AddEditDeleteLog> objAddEditDeleteLogList = _workAction.AddEditDeleteLog.GetAll();
+            var groups = objAddEditDeleteLogList.GroupBy(info => info.Flag)
+                        .Select(group => new
+                        {
+                            Flag = group.Key,
+                            Count = group.Count()
+                        }).ToList();
+
+            Dictionary<int,int> retvalues = new Dictionary<int,int>();
+            foreach(var keyvalue in groups)
+            {
+                retvalues[keyvalue.Flag] = keyvalue.Count;
+            }
+            ViewBag.Flags = retvalues.Keys.ToList();
+            ViewBag.Counts = retvalues.Values.ToList();
+            return View();
+        }
+
         public IActionResult Create()
         {
             return View();
@@ -35,7 +57,7 @@ namespace NoteManager.Controllers
                 _workAction.AddEditDeleteLog.Add(new AddEditDeleteLog()
                 {
                     NoteText = obj.NoteText,
-                    Flag = "Create",
+                    Flag = 1,
                     ActionDateTime = DateTime.Now
                 });
                 _workAction.Save();
@@ -71,9 +93,9 @@ namespace NoteManager.Controllers
                 _workAction.AddEditDeleteLog.Add(new AddEditDeleteLog()
                 {
                     NoteText = obj.NoteText,
-                    Flag = "Edit",
+                    Flag = 2,// later will replace with enum "Edit",
                     ActionDateTime = DateTime.Now
-                });
+                }); ;
                 _workAction.Save();
                 TempData["success"] = "Note updated successfully";
                 return RedirectToAction("Index");
@@ -112,17 +134,17 @@ namespace NoteManager.Controllers
                 _workAction.AddEditDeleteLog.Add(new AddEditDeleteLog()
                 {
                     NoteText = obj.NoteText,
-                    Flag = "Delete",
+                    Flag = 3, //"Delete",
                     ActionDateTime = DateTime.Now
                 });
                 _workAction.Save();
             }
-            catch(Exception ex) 
+            catch (Exception ex)
             {
-                TempData["success"] = "Note not Deleted " +ex.Message;
+                TempData["success"] = "Note not Deleted " + ex.Message;
                 return RedirectToAction("Index");
             }
-           
+
             TempData["success"] = "Note deleted successfully";
             return RedirectToAction("Index");
         }

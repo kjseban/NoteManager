@@ -1,0 +1,53 @@
+﻿@page
+@* NoteManager.Views.Note.StatisticsModel*@
+@model Dictionary<string, int>
+<div>
+    <canvas id="myChart"></canvas>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    var keys = [];
+    var values = [];
+</script>
+@foreach (var key in ViewBag.Flags)
+{  // need to be improved the below code
+    <script>
+        if (@key == 1) { keys.push("Create") }
+        if (@key == 2) { keys.push("Edit") }
+        if (@key == 3) { keys.push("Delete") }
+    </script>
+}
+@foreach (var key in ViewBag.Counts)
+{
+    <script>values.push(@key)</script>
+}
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+@if (SignInManager.IsSignedIn(User))
+{
+
+    <script>
+        const ctx = document.getElementById('myChart');
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: [...keys],
+                datasets: [{
+                    label: '# CRUD operations',
+                    data: [...values],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
+}

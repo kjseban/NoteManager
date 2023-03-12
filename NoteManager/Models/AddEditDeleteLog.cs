@@ -9,7 +9,7 @@ namespace NoteManager.Models
         [Required]
         public string NoteText { get; set; }
         [Required]
-        public string Flag { get; set; }
+        public int Flag { get; set; }
         [Required]
         public DateTime ActionDateTime { get; set; } = DateTime.Now;
     }
